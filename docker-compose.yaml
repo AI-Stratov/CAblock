@@ -1,0 +1,34 @@
+version: '0.1'
+volumes:
+  data:
+  test_data:
+
+services:
+  postgres:
+    image: postgres:15.3
+    container_name: db
+    volumes:
+      - data:/var/lib/postgresql/data
+    ports:
+      - '5432:5432'
+    env_file:
+      - .env
+  test_db:
+    image: postgres:15.3
+    container_name: test_db
+    volumes:
+      - test_data:/var/lib/postgresql/data
+    ports:
+      - '5433:5432'
+    env_file:
+      - .env
+  web:
+    build: ./
+    container_name: cablock
+    ports:
+      - '8080:80'
+    env_file:
+      - .env
+    depends_on:
+      - postgres
+      - test_db
