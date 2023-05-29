@@ -7,10 +7,10 @@ from sqlalchemy import create_engine, text
 from sqlalchemy.orm import sessionmaker
 
 from app.app import app
-from app.config import DATABASE_URL_TEST
+from app.config import settings
 from app.db import Base, get_db
 
-engine = create_engine(DATABASE_URL_TEST)
+engine = create_engine(settings.database_url_test)
 TestingSessionLocal = sessionmaker(
     autocommit=False, autoflush=True, bind=engine,
 )
@@ -31,7 +31,7 @@ app.dependency_overrides[get_db] = override_get_db
 @pytest.fixture(scope="session")
 def db_engine():
     """Create database engine."""
-    engine_test = create_engine(DATABASE_URL_TEST)
+    engine_test = create_engine(settings.database_url_test)
     yield engine_test
     engine_test.dispose()
 
@@ -50,7 +50,7 @@ def alembic_config(db_engine):
     """Create alembic config."""
     test_config = Config()
     test_config.set_main_option("script_location", "migrations/")
-    test_config.set_main_option("sqlalchemy.url", DATABASE_URL_TEST)
+    test_config.set_main_option("sqlalchemy.url", settings.database_url_test)
     test_config.attributes["connection"] = db_engine.connect()
     yield test_config
     test_config.attributes["connection"].close()

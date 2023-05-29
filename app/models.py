@@ -1,4 +1,5 @@
 """Models for database tables."""
+import json
 from datetime import datetime
 
 from sqlalchemy import (TIMESTAMP, BigInteger, Boolean, Column, ForeignKey,
@@ -87,6 +88,7 @@ class Request(Base):
         nullable=True,
     )
 
+    details = relationship("RequestDetail", back_populates="request")
     system = relationship("DictSystem")
 
 
@@ -255,5 +257,5 @@ class RequestDetail(Base):
         nullable=True,
     )
 
-    request = relationship("Request")
+    request = relationship("Request", back_populates="details")
     workflow = relationship("DictWorkflow")

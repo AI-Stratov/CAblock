@@ -1,27 +1,33 @@
 """Config file for the application."""
-import os
+from pydantic import BaseSettings
 
-from dotenv import load_dotenv
 
-load_dotenv()
+class Settings(BaseSettings):
+    db_host: str
+    db_port: str
+    db_name: str
+    db_user: str
+    db_pass: str
 
-DB_HOST = os.environ.get("DB_HOST")
-DB_PORT = os.environ.get("DB_PORT")
-DB_NAME = os.environ.get("DB_NAME")
-DB_USER = os.environ.get("DB_USER")
-DB_PASS = os.environ.get("DB_PASS")
+    db_host_test: str
+    db_port_test: str
+    db_name_test: str
+    db_user_test: str
+    db_pass_test: str
 
-DB_HOST_TEST = os.environ.get("DB_HOST_TEST")
-DB_PORT_TEST = os.environ.get("DB_PORT_TEST")
-DB_NAME_TEST = os.environ.get("DB_NAME_TEST")
-DB_USER_TEST = os.environ.get("DB_USER_TEST")
-DB_PASS_TEST = os.environ.get("DB_PASS_TEST")
+    alembic_test_config: str
 
-ALEMBIC_TEST_CONFIG = os.environ.get("ALEMBIC_TEST_CONFIG")
+    class Config:
+        env_file = ".env"
+        env_file_encoding = "utf-8"
 
-SQLALCHEMY_DATABASE_URL = (
-    f"postgresql://{DB_USER}:{DB_PASS}@{DB_HOST}:{DB_PORT}/{DB_NAME}"
-)
-DATABASE_URL_TEST = (
-    f"postgresql://{DB_USER_TEST}:{DB_PASS_TEST}@{DB_HOST_TEST}:{DB_PORT_TEST}/{DB_NAME_TEST}"
-)
+    @property
+    def sql_alchemy_database_url(self):
+        return f"postgresql://{self.db_user}:{self.db_pass}@{self.db_host}:{self.db_port}/{self.db_name}"
+
+    @property
+    def database_url_test(self):
+        return f"postgresql://{self.db_user_test}:{self.db_pass_test}@{self.db_host_test}:{self.db_port_test}/{self.db_name_test}"
+
+
+settings = Settings()

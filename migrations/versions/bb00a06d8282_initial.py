@@ -1,19 +1,18 @@
 """initial
 
-Revision ID: 00e79afb36cf
+Revision ID: bb00a06d8282
 Revises: 
-Create Date: 2023-05-27 11:25:48.879725
+Create Date: 2023-05-29 23:24:39.905527
 
 """
-import sqlalchemy as sa
 from alembic import op
+import sqlalchemy as sa
 from sqlalchemy.dialects import postgresql
 from sqlalchemy.orm import sessionmaker
-
 from app import models
 
 # revision identifiers, used by Alembic.
-revision = '00e79afb36cf'
+revision = 'bb00a06d8282'
 down_revision = None
 branch_labels = None
 depends_on = None

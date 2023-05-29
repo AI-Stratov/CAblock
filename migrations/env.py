@@ -4,16 +4,14 @@ from logging.config import fileConfig
 from alembic import context
 from sqlalchemy import engine_from_config, pool
 
-from app.config import (ALEMBIC_TEST_CONFIG, DATABASE_URL_TEST,
-                        SQLALCHEMY_DATABASE_URL)
+from app.config import settings
 from app.models import Base
 
 config = context.config
-if ALEMBIC_TEST_CONFIG == "Test":
-    config.set_main_option('sqlalchemy.url', DATABASE_URL_TEST)
+if settings.alembic_test_config == "Test":
+    config.set_main_option('sqlalchemy.url', settings.database_url_test)
 else:
-    config.set_main_option('sqlalchemy.url', SQLALCHEMY_DATABASE_URL)
-
+    config.set_main_option('sqlalchemy.url', settings.sql_alchemy_database_url)
 
 
 if config.config_file_name is not None:

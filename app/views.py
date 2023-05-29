@@ -2,65 +2,107 @@
 from datetime import datetime
 
 from fastapi import APIRouter, Depends
+from fastapi.encoders import jsonable_encoder
 from sqlalchemy import text
 
 import app.models as models
+import app.schemas as schemas
 from app.db import get_db
 from app.models import Request as AppRequest
-from app.schemas import BlockRequest, CheckRequest
 
 router = APIRouter()
 
 
-@router.post("/block")
-def create_block(request: BlockRequest, session=Depends(get_db)):
+@router.post("/block", response_model=schemas.BlockResponse)
+def create_block(request: schemas.BlockRequest, session=Depends(get_db)):
     """Create block request."""
-    data = request.dict()
-    details_data = data.pop("details")
+    details_data = request.details
     created_at = datetime.now()
-    req = AppRequest(**data, blocking=True, created_at=created_at)
+
+    req = AppRequest(
+        is_resident=request.is_resident,
+        inn=request.inn,
+        ogrn=request.ogrn,
+        in_sap=request.in_sap,
+        sap_num=request.sap_num,
+        mdm_id=request.mdm_id,
+        blocking=True,
+        from_system=request.from_system,
+        created_at=created_at,
+        created_by=request.created_by,
+        approved_at=request.approved_at,
+        approved_by=request.approved_by,
+        start_at=request.start_at,
+        end_at=request.end_at,
+        description=request.description,
+    )
 
     session.add(req)
     session.commit()
     session.refresh(req)
 
-    for detail_data in details_data:
-        detail = models.RequestDetail(**detail_data, request_id=req.id)
-        session.add(detail)
+    detail_data = details_data[0]
+    params_json = jsonable_encoder(detail_data.params)
+    detail = models.RequestDetail(
+        workflow_code=detail_data.workflow_code,
+        params=params_json,
+        request_id=req.id,
+    )
+    session.add(detail)
     session.commit()
 
-    request_id = req.id
-    reg_datetime = req.created_at
+    return schemas.BlockResponse(
+        request_id=req.id,
+        reg_datetime=req.created_at,
+    )
 
-    return {"request_id": request_id, "reg_datetime": reg_datetime}
 
-
-@router.post("/unblock")
-def create_unblock(request: BlockRequest, session=Depends(get_db)):
+@router.post("/unblock", response_model=schemas.BlockResponse)
+def create_unblock(request: schemas.BlockRequest, session=Depends(get_db)):
     """Create unblock request."""
-    data = request.dict()
-    details_data = data.pop("details")
+    details_data = request.details
     created_at = datetime.now()
 
-    req = AppRequest(**data, blocking=False, created_at=created_at)
+    req = AppRequest(
+        is_resident=request.is_resident,
+        inn=request.inn,
+        ogrn=request.ogrn,
+        in_sap=request.in_sap,
+        sap_num=request.sap_num,
+        mdm_id=request.mdm_id,
+        blocking=False,
+        from_system=request.from_system,
+        created_at=created_at,
+        created_by=request.created_by,
+        approved_at=request.approved_at,
+        approved_by=request.approved_by,
+        start_at=request.start_at,
+        end_at=request.end_at,
+        description=request.description,
+    )
 
     session.add(req)
     session.commit()
     session.refresh(req)
 
-    for detail_data in details_data:
-        detail = models.RequestDetail(**detail_data, request_id=req.id)
-        session.add(detail)
+    detail_data = details_data[0]
+    params_json = jsonable_encoder(detail_data.params)
+    detail = models.RequestDetail(
+        workflow_code=detail_data.workflow_code,
+        params=params_json,
+        request_id=req.id,
+    )
+    session.add(detail)
     session.commit()
 
-    request_id = req.id
-    reg_datetime = req.created_at
+    return schemas.BlockResponse(
+        request_id=req.id,
+        reg_datetime=req.created_at,
+    )
 
-    return {"request_id": request_id, "reg_datetime": reg_datetime}
 
-
-@router.post("/check")
-def check(request: CheckRequest, session=Depends(get_db)):
+@router.post("/check", response_model=schemas.CheckResponse)
+def check(request: schemas.CheckRequest, session=Depends(get_db)):
     """Check request."""
     blocking_status = False
 
@@ -113,10 +155,10 @@ def check(request: CheckRequest, session=Depends(get_db)):
         if not doc_data:
             blocking_status = True
 
-    return {"blocking": blocking_status}
+    return schemas.CheckResponse(blocking=blocking_status)
 
 
-@router.get("/dict_operation")
+@router.get("/dict_operation", response_model=schemas.DictOperationResponse)
 def get_dict_operation(session=Depends(get_db)):
     """Get blocking operations."""
     operations = (
@@ -130,18 +172,18 @@ def get_dict_operation(session=Depends(get_db)):
         }
         for op in operations
     ]
-    return {"data": data}
+    return schemas.DictOperationResponse(data=data)
 
 
-@router.get("/dict_system")
+@router.get("/dict_system", response_model=schemas.DictSystemResponse)
 async def get_dict_system(session=Depends(get_db)):
     """Get blocking systems."""
     systems = session.query(models.DictSystem).filter_by(source_doc=True).all()
     data = [{"code": system.code, "name": system.name} for system in systems]
-    return {"data": data}
+    return schemas.DictSystemResponse(data=data)
 
 
-@router.get("/dict_doc_type")
+@router.get("/dict_doc_type", response_model=schemas.DictDocTypeResponse)
 def get_dict_doc_type(system_code: int, session=Depends(get_db)):
     """Get blocking document types."""
     doc_types = (
@@ -161,10 +203,10 @@ def get_dict_doc_type(system_code: int, session=Depends(get_db)):
         }
         for doc_type in doc_types
     ]
-    return {"data": data}
+    return schemas.DictDocTypeResponse(data=data)
 
 
-@router.get("/dict_action")
+@router.get("/dict_action", response_model=schemas.DictActionResponse)
 def get_dict_action(doc_type_code: int, session=Depends(get_db)):
     """Get blocking actions."""
     actions = (
@@ -188,7 +230,7 @@ def get_dict_action(doc_type_code: int, session=Depends(get_db)):
         }
         for action in actions
     ]
-    return {"data": data}
+    return schemas.DictActionResponse(data=data)
 
 
 @router.post("/report")
