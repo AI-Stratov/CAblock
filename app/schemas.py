@@ -76,23 +76,15 @@ class CheckResponse(BaseModel):
 
 class DictOperation(BaseModel):
     """Dict operation schema."""
+
     sap_code: str
     sap_name: str
     name: str
 
 
-class DictOperationResponse(BaseModel):
-    """Dict operation response schema."""
-    data: List[DictOperation]
-
-
 class DictSystemSchema(BaseModel):
     code: int
     name: str
-
-
-class DictSystemResponse(BaseModel):
-    data: List[DictSystemSchema]
 
 
 class DictDocTypeSchema(BaseModel):
@@ -101,17 +93,9 @@ class DictDocTypeSchema(BaseModel):
     fullname: str
 
 
-class DictDocTypeResponse(BaseModel):
-    data: List[DictDocTypeSchema]
-
-
 class DictActionCodeSchema(BaseModel):
     """Dict action code schema."""
+
     code: int
     name: str
-
-
-class DictActionResponse(BaseModel):
-    """Dict action response schema."""
-    data: List[DictActionCodeSchema]
 

@@ -84,8 +84,8 @@ class TestViews:
     def test_check_true(self, test_client):
         """Check request should return 200 and blocking: True."""
         expected_response = {
-            "blocking": True,
-        }
+                "blocking": True,
+            }
         response = test_client.post("/check", json=self.check_params)
         assert response.status_code == HTTPStatus.OK, response.text
         assert response.json() == expected_response
@@ -96,8 +96,8 @@ class TestViews:
         self.check_params["ogrn"] = "checkfalseogrn"
         self.check_params["sap_num"] = "checkfalsesapnum"
         expected_response = {
-            "blocking": False,
-        }
+                "blocking": False,
+            }
         response = test_client.post("/check", json=self.check_params)
         assert response.status_code == HTTPStatus.OK, response.text
         assert response.json() == expected_response
@@ -105,8 +105,7 @@ class TestViews:
     def test_dict_operation(self, test_client):
         """Request should return 200 and dict_operation."""
         response = test_client.get("/dict_operation")
-        expected_response = {
-            "data": [
+        expected_response = [
                 {
                     "sap_code": "P1",
                     "sap_name": "ТОВАР",
@@ -163,48 +162,41 @@ class TestViews:
                     "sap_name": "test_system",
                     "name": "test_name",
                 },
-            ],
-        }
+            ]
         assert response.status_code == HTTPStatus.OK, response.text
         assert response.json() == expected_response
 
     def test_dict_system(self, test_client):
         """Request should return 200 and dict_system."""
         response = test_client.get("/dict_system")
-        expected_response = {
-            "data": [
+        expected_response = [
                 {"code": 1, "name": "SAP ERP"},
                 {"code": 2, "name": "СЭД"},
-            ],
-        }
+            ]
         assert response.status_code == HTTPStatus.OK, response.text
         assert response.json() == expected_response
 
     def test_dict_doc_type(self, test_client):
         """Request should return 200 and dict_doc_type."""
         response = test_client.get("/dict_doc_type", params={"system_code": 1})
-        expected_response = {
-            "data": [
+        expected_response = [
                 {
                     "code": 1,
                     "name": "FI",
                     "fullname": "бухгалтерский документ",
                 },
                 {"code": 2, "name": "MM", "fullname": "заказ на закупку"},
-            ],
-        }
+            ]
         assert response.status_code == HTTPStatus.OK, response.text
         assert response.json() == expected_response
 
     def test_dict_action(self, test_client):
         """Request should return 200 and dict_action."""
         response = test_client.get("/dict_action", params={"doc_type_code": 2})
-        expected_response = {
-            "data": [
+        expected_response = [
                 {"code": 1, "name": "изменение"},
                 {"code": 2, "name": "сторнирование"},
                 {"code": 3, "name": "создать последующий"},
-            ],
-        }
+            ]
         assert response.status_code == HTTPStatus.OK, response.text
         assert response.json() == expected_response

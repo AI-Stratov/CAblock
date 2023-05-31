@@ -28,4 +28,9 @@ Change .env var ALEMBIC_TEST_CONFIG to "Test"
 ```poetry run pytest```
 
 ## Docker
-Work in progress
+Change .env vars DB_HOST and DB_HOST_TEST to container names
+
+```docker-compose up --build```
+
+You can reach the API at http://localhost:8080
+
